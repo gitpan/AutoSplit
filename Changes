@@ -1,0 +1,21 @@
+=head1 18 Jul, 1997
+
+Changed the whole concept to have the internal function autosplit_file
+actually act on *files*, not on modules, thus allowing for several
+packages within a file. Inspired by comments that had been written in
+the original file by Tim (I suppose). Several messages from AutoSplit
+have changed to reflect the new concept.
+
+Made use strict clean.
+
+Added $VERSION
+
+Renamed several internal variables that had non-intuitive names.
+
+Made it a distribution with a testfile.
+
+Fixed bug: too long subroutine names lost prototype. (Very minor bug)
+
+Slightly improved the documentation.
+
+
