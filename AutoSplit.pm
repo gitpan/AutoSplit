@@ -1,10 +1,8 @@
 package AutoSplit;
 
-require 5.000;
-require Exporter;
-
-use Config;
-use Carp;
+use Exporter ();
+use Config qw(%Config);
+use Carp qw(carp);
 use File::Basename ();
 use File::Path qw(mkpath);
 use strict;
@@ -13,7 +11,7 @@ use vars qw(
 	    $Verbose $Keep $Maxlen $CheckForAutoloader $CheckModTime
 	   );
 
-$VERSION = "1.01";
+$VERSION = "1.02";
 @ISA = qw(Exporter);
 @EXPORT = qw(&autosplit &autosplit_lib_modules);
 @EXPORT_OK = qw($Verbose $Keep $Maxlen $CheckForAutoloader $CheckModTime);

@@ -1,3 +1,9 @@
+=head1 1 Aug, 1997
+
+Repackaging of an otherwise (nearly) unaltered package. I had wrong
+timestamps in the year 2020 which caused some make()s to bail out.
+I took the opportunity to change the intro a little.
+
 =head1 18 Jul, 1997
 
 Changed the whole concept to have the internal function autosplit_file
