@@ -11,7 +11,7 @@ use vars qw(
 	    $Verbose $Keep $Maxlen $CheckForAutoloader $CheckModTime
 	   );
 
-$VERSION = "1.02";
+$VERSION = "1.03";
 @ISA = qw(Exporter);
 @EXPORT = qw(&autosplit &autosplit_lib_modules);
 @EXPORT_OK = qw($Verbose $Keep $Maxlen $CheckForAutoloader $CheckModTime);
@@ -112,22 +112,23 @@ are supported:
 
 =head1 DIAGNOSTICS
 
-C<AutoSplit> will inform the user if it is necessary to create the top-level
-directory specified in the invocation. It is preferred that the script or
-installation process that invokes C<AutoSplit> have created the full directory
-path ahead of time. This warning may indicate that the module is being split
-into an incorrect path.
+C<AutoSplit> will inform the user if it is necessary to create the
+top-level directory specified in the invocation. It is preferred that
+the script or installation process that invokes C<AutoSplit> have
+created the full directory path ahead of time. This warning may
+indicate that the module is being split into an incorrect path.
 
-C<AutoSplit> will warn the user of all subroutines whose name causes potential
-file naming conflicts on machines with drastically limited (8 characters or
-less) file name length. Since the subroutine name is used as the file name,
-these warnings can aid in portability to such systems.
+C<AutoSplit> will warn the user of all subroutines whose name causes
+potential file naming conflicts on machines with drastically limited
+(8 characters or less) file name length. Since the subroutine name is
+used as the file name, these warnings can aid in portability to such
+systems.
 
-Warnings are issued and the file skipped if C<AutoSplit> cannot locate either
-the I<__END__> marker or a "package Name;"-style specification.
+Warnings are issued and the file skipped if C<AutoSplit> cannot locate
+either the I<__END__> marker or a "package Name;"-style specification.
 
-C<AutoSplit> will also emit general diagnostics for inability to create
-directories or files.
+C<AutoSplit> will also emit general diagnostics for inability to
+create directories or files.
 
 =cut
 
@@ -211,9 +212,10 @@ sub autosplit_file {
     my($pm_mod_time) = (stat($filename))[9];
     my($autoloader_seen) = 0;
     my($in_pod) = 0;
-    my($def_package,$last_package,$this_package);
+    my($def_package,$last_package,$this_package,$fnr);
     while (<IN>) {
 	# Skip pod text.
+	$fnr++;
 	$in_pod = 1 if /^=/;
 	$in_pod = 0 if /^=cut/;
 	next if ($in_pod || /^=cut/);
@@ -227,7 +229,7 @@ sub autosplit_file {
     if ($check_for_autoloader && !$autoloader_seen){
 	print "AutoSplit skipped $filename: no AutoLoader used\n"
 	    if ($Verbose>=2);
-	return 0
+	return 0;
     }
     $_ or die "Can't find __END__ in $filename\n";
 
@@ -272,10 +274,11 @@ sub autosplit_file {
     my $caching = 1;
     $last_package = '';
     while (<IN>) {
+	$fnr++;
 	$in_pod = 1 if /^=/;
 	$in_pod = 0 if /^=cut/;
 	next if ($in_pod || /^=cut/);
-	# this gives big troubles if a
+	# the following (tempting) old coding gives big troubles if a
 	# cut is forgotten at EOF:
 	# next if /^=\w/ .. /^=cut/;
 	if (/^package\s+([\w:]+)\s*;/) {
@@ -309,10 +312,11 @@ sub autosplit_file {
 		print "  writing $spath (with truncated name)\n"
 			if ($Verbose>=1);
 	    }
-	    print OUT "# NOTE: Derived from $filename.\n" .
-		"# Changes made here will be lost when autosplit again.\n" .
-		"# See AutoSplit.pm.\n";
-	    print OUT "package $this_package;\n\n";
+	    print OUT qq{# NOTE: Derived from $filename.
+# Changes made here will be lost when autosplit again.
+# See AutoSplit.pm.
+};
+	    print OUT "package $this_package;\n\n#line $fnr $filename\n";
 	    print OUT @cache;
 	    @cache = ();
 	    $caching = 0;
@@ -430,7 +434,7 @@ sub test3 ($$$) { "test 3\n"; }
 sub testtesttesttest4_1  { "test 4\n"; }
 sub testtesttesttest4_2  { "duplicate test 4\n"; }
 sub Just::Another::test5 { "another test 5\n"; }
-sub test6       { "test 6\n"; }
+sub test6       { return join ":", __FILE__,__LINE__; }
 package Yet::Another::AutoSplit;
 sub testtesttesttest4_1 ($)  { "another test 4\n"; }
 sub testtesttesttest4_2 ($$) { "another duplicate test 4\n"; }

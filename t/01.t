@@ -7,7 +7,7 @@
 # Change 1..1 below to 1..last_test_to_print .
 # (It may become useful if the test is moved to ./t subdirectory.)
 
-BEGIN { $| = 1; print "1..15\n"; }
+BEGIN { $| = 1; print "1..16\n"; }
 END {print "not ok 1\n" unless $loaded;}
 use AutoSplit;
 use File::Path;
@@ -46,4 +46,11 @@ auto/Yet/Another/AutoSplit/testtesttesttest4_2.al
 	     ) {
     print -f $file ? "" : "not ", "ok ", $i++, " ($file)\n";
 }
+unshift @INC, ".";
+require AutoLoader;
+*AutoSplit::AUTOLOAD =
+*AutoSplit::AUTOLOAD = \&AutoLoader::AUTOLOAD;
+
+print AutoSplit::test6()=~/^AutoSplit/ ? "ok 16\n" : "not ok 16\n";
+
 rmtree "auto";
